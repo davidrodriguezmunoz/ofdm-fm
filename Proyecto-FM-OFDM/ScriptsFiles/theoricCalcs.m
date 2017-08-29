@@ -19,7 +19,7 @@ BERteoR=berfading(ebno,'qam',modo,1);   %Rayleigh
 BLERteo=1-((1-BERteo).^longB);   
 
 % Ajusto la BER devuelta en función del efecto utilizado
-if strcmp('CH',efecto)
+if max(strcmp('CH',efecto))
     BERteo = BERteoR;
 end
 
@@ -32,7 +32,7 @@ else
 end
 
 % Almaceno los resultados teóricos
-f1=fopen(['ResultsFiles/OFDM teórico ', modo, ' ',efecto,'.txt'],'w');
+f1=fopen(['ResultsFiles/OFDM teórico ', modo,'.txt'],'w');
 for n=1:length(SNR)
     fprintf(f1,'%6s %12s %12s\n','snr','BER canal','BLER canal');
     fprintf(f1,'%6.1f %12.6E %12.5E\n',SNR(n),BERteo(n),BLERteo(n));

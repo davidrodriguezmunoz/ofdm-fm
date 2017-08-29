@@ -10,39 +10,39 @@ if borrado==1
     delete('.\ExecutionFiles\*');
 end
 
-speed=[ 5 ];
+speed=[ 5 50 120 250 500 ];
 dft=0;
 % QPSK
 for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados','CH',dft,0,speed(k),'mmse');
+    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'mmse');
     close all;
 end
 
 for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'zfe');
      close all;
 end
 
  dft=1;
 for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados','CH',dft,0,speed(k),'mmse');
+    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'mmse');
     close all;
 end
 
 for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'zfe');
      close all;
 end
 
 % 16QAM
 dft=0;
 for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'mmse');
+    variacionSNR('16QAM',0,'separados',{'CH'},dft,0,speed(k),'mmse');
     close all;
 end
 
 for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zfe');
      close all;
 end
 
@@ -53,7 +53,7 @@ for k=1:length(speed);
 end
 
 for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zfe');
      close all;
 end
 
@@ -66,7 +66,7 @@ for k=1:length(speed);
 end
 
 for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zfe');
      close all;
 end
 
@@ -77,7 +77,7 @@ for k=1:length(speed);
 end
 
 for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zf');
+    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zfe');
      close all;
 end
 

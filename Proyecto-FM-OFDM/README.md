@@ -25,5 +25,5 @@ Los parámetros de la simulación se modifican dentro del propio script de __varia
 
 Ejemplo de uso:
 ´´´
-variacionSNR('16QAM',0,'separados','CH',0,5,'mmse');
+variacionSNR('16QAM',0,'separados',{'CH'},0,5,'mmse');
 ´´´

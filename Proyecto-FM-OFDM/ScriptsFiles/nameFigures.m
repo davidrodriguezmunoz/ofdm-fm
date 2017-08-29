@@ -47,16 +47,28 @@ end
 
 % En función del efecto se mostrará un texto u otro
 txt_efecto = '';
-if strcmp(efecto,'NO')
-    txt_efecto = 'AWGN';
-elseif strcmp(efecto,'CH') || strcmp(tipo,'juntos')
-    txt_efecto1 = [num2str(speedKMH), ' kmh'];
-    txt_efecto2= [' ', 'Eq ',eq_type];
-    txt_efecto=[txt_efecto1,txt_efecto2];
-elseif strcmp(efecto,'PN') || strcmp(efecto,'CFO')
-    txt_efecto = efecto;
+if max(strcmp(efecto,'CH')) || max(strcmp(tipo,'juntos'))
+     txt_efecto1 = [num2str(speedKMH), ' kmh'];
+     txt_efecto2= [' ', 'Eq ',eq_type,' canal awgn'];
+     txt_efecto=[txt_efecto1,txt_efecto2];
+elseif max(strcmp(efecto,'NO'))
+    txt_efecto = ' canal AWGN';
+    
 end
 
+if max(strcmp(efecto,'PN'))
+    txt_efecto = [txt_efecto,', con PN'];
+end
+
+if max(strcmp(efecto,'CFO'))
+    txt_efecto = [txt_efecto,', con CFO'];
+end
+
+if max(strcmp(efecto,'OFFSET'))
+    txt_efecto = [txt_efecto,', con offset de sinc '];
+end
+
+%con dft o sin dft
 txt_dft = ' sin dft';
 if dft
     txt_dft = ' con dft';

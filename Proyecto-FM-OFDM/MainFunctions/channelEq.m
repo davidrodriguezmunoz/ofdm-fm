@@ -13,8 +13,8 @@ N0=1/(10^(SNR/10));
     
     
     if strcmp(type,'mmse')
-%         h_f_mmse=conj(h_f)./(h_f.*conj(h_f) + N0);
-%         rx_rec_mmse=(ifft(rx_f.*h_f_mmse));
+        h_f_mmse=conj(h_f)./(h_f.*conj(h_f) + N0);
+        rx_rec_mmse=(ifft(rx_f.*h_f_mmse));
         h_n=[h_n zeros(1,abs(length(h_n)-max(size(rx_matrix))))];
         output(:,simbolo)=rx_rec_mmse(1:L)';
     elseif strcmp(type,'zfe');  

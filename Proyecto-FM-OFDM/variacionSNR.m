@@ -17,7 +17,8 @@ function []=variacionSNR(modo,codificar,tipo,efecto,dft,sinc,speed,eq_type)
 %                   simulación se pedirá el valor de la velocidad.
 %  - dft: Indica si se usa la DFT adicional (1) o no (0).
 %  - sinc: Indica si se realiza sincronismo (1) o no (0).
-%
+%  - speed: Indica la velocidad a la que se mueve el usuario. 
+%  - eq_type: Indica el tipo de equalizacción.
 % Los parámetros de la simulación se modifican en este script.
 %
 % Ejemplo de uso:
@@ -37,7 +38,7 @@ rng('shuffle','twister');           % Inicialización del generado
 % Compruebo el número de argumentos introducidos
 narginchk(3,8);
 
-% Si se introduce solo un argumento asigno el valor de efecto
+% Si se introduce solo un argumento asigno el valor por defecto
 switch nargin
     case 3
         efecto='NO';
@@ -51,13 +52,19 @@ switch nargin
 end
 
 % Comprueba que se hayan introducido correctamente los argumentos
-checkArgs(tipo,efecto,modo);
+if ~exist('speed','var')
+    speed=-1;
+end
+if ~exist('eq_type','var')
+    eq_type='no equalization written';
+end
+checkArgs(tipo,efecto,modo,speed,eq_type);
 
 % Comprueba que existan los directorios para guardar los resultados
 checkFolders();
 
 % Leo el valor de velocidad en los casos que se requiera
-if strcmp(tipo,'juntos') || strcmp(efecto,'CH')
+if strcmp(tipo,'juntos') || sum(strcmp(efecto,'CH'))==1
 %     speedKMH = input('Introduce el valor de la velocidad (km/h): ');
       speedKMH=speed;
 else
@@ -78,7 +85,7 @@ end
 
 % Valores globales de la tecnología
 blockErSim = 400;                             % Bloques erroneos a simular (Para Rayleigh se recomiendan 400, para Gauss 200)
-SNR = 0:3:18;                      % [primSNR:step:ultSNR] para simulación (dB)
+SNR = 0:3:18;           % [primSNR:step:ultSNR] para simulación (dB)
 tau = (1e-9)*[0 30, 70, 90, 115, 190, 410];   % Perfil de retardos del canal Rayleigh (s)
 pdb = [0 -1, -2, -3, -8, -17.2, -20.8];       % Perfil de amplitudes del canal Rayleigh
 r = 1;                                        % Factor de sobremuestreo
@@ -96,6 +103,8 @@ longCP = 160;                                 % Vector de longitudes del prefijo
 longCAZAC = 0;                              % Vector de longitudes del CAZAC
 Npb = 0;                                      % Número de símbolos dedicados a pilotos por bloque
 eq_type=eq_type;                               %tipo de equalizacion
+ventanaCP=longCP/2;
+
 % Valores dependientes del uso de sincronismo
 if sinc
     Nps = 10;                                 % Número de pilotos por símbolo
@@ -125,7 +134,6 @@ Nd = Ndp-Nps;
 sim = struct('modo',modo,...
              'codificar',codificar,...
              'tipo',tipo,...
-             'efecto',efecto,...
              'dft',dft,...
              'blockErSim',blockErSim,...
              'vSNR',SNR,...
@@ -155,8 +163,9 @@ sim = struct('modo',modo,...
              'cpMargin',cpMargin,...
              'delay',delay,...
              'eq_type',eq_type,...
+             'ventanaCP',ventanaCP,...
              'sinc',sinc);
-
+sim.efecto=efecto;
 %% Cálculos teóricos
 
 [BERteo, BLERteo] = theoricCalcs(sim);
@@ -202,32 +211,47 @@ end
 
 end
 
-function checkArgs(tipo, efecto, modo)
+function checkArgs(tipo, efecto, modo,speed,eq_type)
     % Inicializaciones
+
     tipos_permitidos = {'juntos','separados'};    % Tipos de simulación permitidos
-    efectos_permitidos = {'NO','CH','PN','CFO'};  % Efectos a simular permitidos
+    efectos_permitidos = {'NO','CH','PN','CFO','OFFSET'};  % Efectos a simular permitidos
     modos_permitidos = {'QPSK','16QAM','64QAM'};  % Modulaciones permitidas
+    equalizaciones_permitidas ={'mmse','zfe','none'};
     
+    
+
     % Compruebo que los tipos son los correctos
     if ~max(strcmp(tipo,tipos_permitidos))
         error('Tipo solo puede ser {juntos, separados}');
     end
 
     % Compruebo que los efectos son los correctos
-    if ~max(strcmp(efecto,efectos_permitidos))
-        error('Efecto solo puede ser {CH, PN, CFO}');
+    
+    for efecto_aux=efecto
+        if ~max(strcmp(efecto_aux,efectos_permitidos))
+             error('Efecto solo puede ser {CH, PN, CFO, OFFSET}');
+        end
     end
-
+ 
     % Compruebo que los modos son los correctos
     if ~max(strcmp(modo,modos_permitidos))
         error('Modo solo puede ser {QPSK, 16QAM, 64QAM}');
     end
-    
+    if  max(strcmp(efecto,'CH'))||max(strcmp(efecto,'juntos'))
+        if ~max(strcmp(eq_type,equalizaciones_permitidas))
+            error('Equalizacion solo puede ser {mmse, zfe, none}');
+        elseif(speed<0)
+            error('La velocidad debe ser mayor o igual a 0');
+        end
+    end
     % Me aseguro de que si tipo='juntos' entonces efecto='NO'
     if strcmp(tipo,'juntos') && ~strcmp(efecto,'NO')
         warning(['El argumento efecto no se considera puesto que se ',...
                  'simularán todos los efectos juntos'])
     end
+    
+    
 end
 
 function checkFolders()

@@ -277,7 +277,7 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
                rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,'zfe',Nsb);
         elseif CH==1&&juntos==0&&OFFSET==1||juntos==1
                h_n_matrix=channel_estimation(chan,Nssb,Nt,sampleR,speedKMH);
-               h_n_matrix=[zeros(Nsb,ventanaCP-Offset_Sync) h_n_matrix];
+               h_n_matrix=[zeros(Nsb,ventanaCP-offset_sync) h_n_matrix];
                rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,eq_type,Nsb);
         end
     % reconstruir la respuesta al impulso y aplicar ZF/MMSE
