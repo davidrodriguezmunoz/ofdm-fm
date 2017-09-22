@@ -1,4 +1,4 @@
-function []=variacionSNR(modo,codificar,tipo,efecto,dft,sinc,speed,eq_type)
+function []=variacionSNR(modo,codificar,tipo,efecto,dft,sinc,speed,eq_type,TTI)
 % Script variacionSNR
 %
 % Argumentos de entrada:
@@ -19,6 +19,7 @@ function []=variacionSNR(modo,codificar,tipo,efecto,dft,sinc,speed,eq_type)
 %  - sinc: Indica si se realiza sincronismo (1) o no (0).
 %  - speed: Indica la velocidad a la que se mueve el usuario. 
 %  - eq_type: Indica el tipo de equalizacción.
+ % -TTI: Transmision Time Interval (ms)
 % Los parámetros de la simulación se modifican en este script.
 %
 % Ejemplo de uso:
@@ -36,7 +37,7 @@ rng('shuffle','twister');           % Inicialización del generado
 %% Comprobación de los argumentos de entrada y lectura de valores necesarios
 
 % Compruebo el número de argumentos introducidos
-narginchk(3,8);
+narginchk(3,9);
 
 % Si se introduce solo un argumento asigno el valor por defecto
 switch nargin
@@ -51,12 +52,16 @@ switch nargin
         sinc = 0;
 end
 
+
 % Comprueba que se hayan introducido correctamente los argumentos
 if ~exist('speed','var')
     speed=-1;
 end
 if ~exist('eq_type','var')
     eq_type='no equalization written';
+end
+if ~exist('TTI','var')
+    TTI=1;
 end
 checkArgs(tipo,efecto,modo,speed,eq_type);
 
@@ -85,26 +90,27 @@ end
 
 % Valores globales de la tecnología
 blockErSim = 400;                             % Bloques erroneos a simular (Para Rayleigh se recomiendan 400, para Gauss 200)
-SNR = 0:3:18;           % [primSNR:step:ultSNR] para simulación (dB)
-tau = (1e-9)*[0 30, 70, 90, 115, 190, 410];   % Perfil de retardos del canal Rayleigh (s)
-pdb = [0 -1, -2, -3, -8, -17.2, -20.8];       % Perfil de amplitudes del canal Rayleigh
+SNR = 0:3:28;       % [primSNR:step:ultSNR] para simulación (dB)
+tau = (1e-9)*[0 30, 70, 90, 115, 190]%, %410];   % Perfil de retardos del canal Rayleigh (s)
+pdb = [0 -1, -2, -3, -8, -17.2]%, -20.8];       % Perfil de amplitudes del canal Rayleigh
 r = 1;                                        % Factor de sobremuestreo
-fc = 1e10;                                    % Frecuencia de la portadora (10 GHz)
-sampleR=r*30.72e6;                            % Frecuencia de muestreo
+fc = 3.5e9;                                    % Frecuencia de la portadora (10 GHz)
 Nsc=r*2048;                                   % Longitud IFFT (subportadoras) por simbolo
 k0 = 1;                                       % Subportadora de corte
 Ndp = 250;                                     % Número de portadoras de datos y pilotos
-Na=r*2*(Ndp+k0);                               % Número de portadoras activas
+Na=2*(Ndp+k0);                               % Número de portadoras activas
 Nsb=14;                                       % Número de símbolos por bloque
 normalizar = 1;                               % Normalización de las subportadoras
 mList = [0.33,0.3];                           % Lista de posibles valores de m
 m = mList(dft+1);                             % Valor de m
-longCP = 160;                                 % Vector de longitudes del prefijo cíclico
-longCAZAC = 0;                              % Vector de longitudes del CAZAC
+longCP = ones(1,Nsb)*144;                     % Vector de longitudes del prefijo cíclico
+longCP([1 8])=160;                            %LTE símbolo 0 y 7 tienen longitud CP de 160
+longCAZAC = 0;                                % Vector de longitudes del CAZAC
 Npb = 0;                                      % Número de símbolos dedicados a pilotos por bloque
-eq_type=eq_type;                               %tipo de equalizacion
-ventanaCP=longCP/2;
-
+eq_type=eq_type;                              %tipo de equalizacion
+ventanaCP=longCP/2;                             %Tamaño de la venta para solucionaer el OFFSET de sincronismo 
+sampleR=(r*sum(Nsc+longCP))/(TTI*10^-3);                            % Frecuencia de muestreo
+disp(['SampleR= ' num2str(sampleR/(1E6)) ' MHz']);
 % Valores dependientes del uso de sincronismo
 if sinc
     Nps = 10;                                 % Número de pilotos por símbolo
@@ -164,7 +170,8 @@ sim = struct('modo',modo,...
              'delay',delay,...
              'eq_type',eq_type,...
              'ventanaCP',ventanaCP,...
-             'sinc',sinc);
+             'sinc',sinc,...
+             'oversampling',r);
 sim.efecto=efecto;
 %% Cálculos teóricos
 
@@ -230,7 +237,7 @@ function checkArgs(tipo, efecto, modo,speed,eq_type)
     
     for efecto_aux=efecto
         if ~max(strcmp(efecto_aux,efectos_permitidos))
-             error('Efecto solo puede ser {CH, PN, CFO, OFFSET}');
+             error('Efecto solo puede ser {CH, PN, CFO, OFFSET,NO}');
         end
     end
  

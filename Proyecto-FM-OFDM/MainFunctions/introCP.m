@@ -12,10 +12,14 @@ function [tS]=introCP(tS_aux,longCP)
 
 % El CP está formado por los últimos símbolos de información 
 % (subportadoras) del símbolo OFDM
-CP=tS_aux(end-longCP+1:end,:);
-
+tS=cell(1,min(size(tS_aux)));
+for i=1:length(longCP)
+  
+  CP_aux=tS_aux(end-longCP(i)+1:end,i);
+  tS{1,i}=[CP_aux(:).' tS_aux(:,i).'];
+end
 % Se añade al principio del símbolo OFDM (para evitar ISI y poder realizar
 % la convolución circular)
-tS=vertcat(CP,tS_aux);
+
 
 end

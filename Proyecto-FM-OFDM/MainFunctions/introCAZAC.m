@@ -10,7 +10,10 @@ function tS_CAZAC=introCAZAC(tS_d,CAZAC)
 %  - tS_CAZAC: Señal a la que se ha añadido el CAZAC
 
 % Añado la secuencia al principio de la señal
-tS_CAZAC = vertcat(CAZAC,tS_d);
+tS_CAZAC=cell(1,min(size(tS_d)));
+for i=1: length(tS_d)
+    tS_CAZAC{1,i}=[tS_d{1,i}(:).' CAZAC(:).'];
+end
 
 end
 

@@ -1,0 +1,1 @@
+SNR=21 nblocks=1000 ErrBlock=0 BERcanal=0 BLERcanal=0

@@ -1,0 +1,16 @@
+   snr    BER canal   BLER canal
+   0.0 2.183514E-01  1.00000E+00
+   snr    BER canal   BLER canal
+   3.0 1.270145E-01  1.00000E+00
+   snr    BER canal   BLER canal
+   6.0 7.208385E-02  9.87319E-01
+   snr    BER canal   BLER canal
+   9.0 2.193323E-02  9.13043E-01
+   snr    BER canal   BLER canal
+  12.0 5.376822E-03  5.10204E-01
+   snr    BER canal   BLER canal
+  15.0 1.230011E-03  2.19058E-01
+   snr    BER canal   BLER canal
+  18.0 2.804393E-04  1.01163E-01
+   snr    BER canal   BLER canal
+  21.0 4.443005E-05  2.59067E-02

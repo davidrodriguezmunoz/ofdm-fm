@@ -1,84 +1,47 @@
 clc;
 clear;
 close all;
-borrado=input('Presiione 1 si quieres eliminar todo lo de la carpeta ResultFiles y ResultsFigures:');
+borrado=input('Presiione 179 si quieres eliminar todo lo de la carpeta ResultFiles y ResultsFigures:');
 
-if borrado==1
+if borrado==179
     recycle('on');
     delete('.\ResultsFiles\*.txt')
     delete('.\ResultsFigures\*')
     delete('.\ExecutionFiles\*');
 end
 
-speed=[ 5 50 120 250 500 ];
-dft=0;
-% QPSK
-for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'zfe');
-     close all;
-end
-
- dft=1;
-for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('QPSK',0,'separados',{'CH'},dft,0,speed(k),'zfe');
-     close all;
-end
-
-% 16QAM
-dft=0;
-for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados',{'CH'},dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zfe');
-     close all;
-end
-
-dft=1;
-for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('16QAM',0,'separados','CH',dft,0,speed(k),'zfe');
-     close all;
-end
-
-% 64QAM
-
-dft=0;
-for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zfe');
-     close all;
-end
-
-dft=1;
-for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'mmse');
-    close all;
-end
-
-for k=1:length(speed);
-    variacionSNR('64QAM',0,'separados','CH',dft,0,speed(k),'zfe');
-     close all;
-end
+speed_aux=[120 250 500];
+modulacion_aux={'QPSK'};
+ecualizacion_aux={'mmse'};
+dft_aux=[0 1];
 
 
+    for modulacion=modulacion_aux
+        for ecualizacion=ecualizacion_aux
+            for speed=speed_aux
+                for dft=dft_aux
+                    variacionSNR(modulacion{1},0,'separados',{'CH'},dft,0,speed,ecualizacion{1},0.1);
+                end
+            end
+        end
+    end
+    
+    
+    speed_aux=[50 120 250 500];
+modulacion_aux={'16QAM'};
+ecualizacion_aux={'zfe','mmse'};
+dft_aux=[0 1];
+
+
+    for modulacion=modulacion_aux
+        for ecualizacion=ecualizacion_aux
+            for speed=speed_aux
+                for dft=dft_aux
+                    variacionSNR(modulacion{1},0,'separados',{'CH'},dft,0,speed,ecualizacion{1},0.1);
+                end
+            end
+        end
+    end
+   
+
+        

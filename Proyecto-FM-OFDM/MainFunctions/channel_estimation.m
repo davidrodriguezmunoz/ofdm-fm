@@ -6,11 +6,12 @@ function [ H_matrix ] = channel_estimation( chan,Nssb,Nt,sampleR,speedKMH )
     
     
    
-    %se estima mediante el primer dato que tenemos del canal
     for symbol=1:Nssb
         if(speedKMH>0)
-            symbol_gains=total_gains((symbol-1)*Nt+1:symbol*Nt,:);
+            symbol_gains=total_gains((symbol-1)*Nt(symbol)+1:symbol*Nt(symbol),:);
             caracteristic_gain=symbol_gains(1,:);
+            %EL canal es variante en el tiempo 
+            %caracterizamos el canal con el primer dato que tenemos de este
         else
             caracteristic_gain=total_gains;
         end

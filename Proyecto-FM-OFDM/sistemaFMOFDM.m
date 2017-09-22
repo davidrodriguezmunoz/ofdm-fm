@@ -98,11 +98,11 @@ if PN || juntos
     Pot_PN = GenerarPotenciaPN(fc); % Potencia del ruido de fase
 end
 if CH || juntos
-    [chan, nblocks_min] = rayChanGen(fc,sampleR,speedKMH,tau,pdb);
+    [chan, nblocks_min] = rayChanGen(fc,sampleR,speedKMH,tau,pdb); %% Generación del canal de tipo raylength
 end
 
 if OFFSET || juntos
-   Offset_Sync=10;
+   Offset_Sync=50; % offset de sincronismo en numero de samples. 
 end
                        
 %% Sistema
@@ -204,7 +204,8 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
     % Adición del CAZAC
     tSp = introCAZAC(tS_d,CAZAC);
     % Conversor P/S
-    tS = reshape(tSp,Nssb*Nt,1);
+    tS = cell2mat(tSp);
+    tS=tS(:);
         
     % -----------------------------------------------------------------
     %                                CANAL   
@@ -217,7 +218,7 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
         tS = introPN(tS,Pot_PN);
     end
     if CH || juntos
-        tS=filter(chan,tS')';
+        tS=filter(chan,tS.').';
     end
     
     if OFFSET || juntos
@@ -236,7 +237,7 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
     %                               RECEPTOR                               
 
     % Conversor S/P
-    rSp_n = reshape(rS_n,Nt,Nssb);
+    rSp_n = mat2cell(rS_n.',1,Nt);
     if sinc
 %         % Estimación de los retardos usando el CAZAC
 %         iLags = estLagZC(rSp_n, CAZAC);
@@ -262,24 +263,26 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
     %%
     
     % Eliminación del prefijo cíclico (si efecto ~= 'offset')
-    
-        rS_d = elimCP(rS_d_aux,longCP,cpMargin,Nsc,ventanaCP);
-   
+    if juntos==1||OFFSET==1
+        rS_d = elimCP(rS_d_aux,longCP,cpMargin,Nsc,ventanaCP,Nsc,Nsb);
+    else
+         rS_d = elimCP(rS_d_aux,longCP,cpMargin,Nsc,-1,Nsc,Nsb);
+    end
     
     %% Ecualización de la señal 
-    
-        if OFFSET==0&&juntos==0&&CH==1
-              h_n_matrix=channel_estimation(chan,Nssb,Nt,sampleR,speedKMH);
-              rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,eq_type,Nsb);
-        elseif CH==0&&juntos==0&&OFFSET==1
-               h_n_matrix=[zeros(1,ventanaCP-offset_sync) 1];
-               h_n_matrix=repmat(h_n_matrix,[Nsb,1]);
-               rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,'zfe',Nsb);
-        elseif CH==1&&juntos==0&&OFFSET==1||juntos==1
-               h_n_matrix=channel_estimation(chan,Nssb,Nt,sampleR,speedKMH);
-               h_n_matrix=[zeros(Nsb,ventanaCP-Offset_Sync) h_n_matrix];
-               rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,eq_type,Nsb);
-        end
+   
+    if OFFSET==0&&juntos==0&&CH==1
+        h_n_matrix=channel_estimation(chan,Nssb,Nt,sampleR,speedKMH);
+        rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,eq_type,Nsb);
+    elseif CH==0&&juntos==0&&OFFSET==1
+          h_n_matrix=[zeros(1,ventanaCP-Offset_Sync) 1];
+          h_n_matrix=repmat(h_n_matrix,[Nsb,1]);
+          rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,'zfe',Nsb);
+    elseif CH==1&&juntos==0&&OFFSET==1||juntos==1
+          h_n_matrix=channel_estimation(chan,Nssb,Nt,sampleR,speedKMH);
+          h_n_matrix=[zeros(Nsb,ventanaCP-Offset_Sync) h_n_matrix];
+          rS_d=channelEq(h_n_matrix,rS_d,Nsc,SNR,eq_type,Nsb);
+    end
     % reconstruir la respuesta al impulso y aplicar ZF/MMSE
     %%
 
@@ -362,6 +365,7 @@ end
 %% Display de resultados
  
 % Resultados numéricos
+disp(' ');
 disp(['Bloques transmitidos: ',num2str(nblocks)]);
 if codificar
     disp(['BER: ', num2str(berS),'    BLER: ',num2str(blerS)]);

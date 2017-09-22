@@ -1,4 +1,4 @@
-function rX=elimCP(rS, longCP, cpMargin,N,ventanaCP)
+function rX=elimCP(rS, longCP, cpMargin,N,ventanaCP,Nsc,Nsb)
 % Eliminación del prefijo cíclico en una secuencia recibida determinada
 %
 % Entradas:
@@ -13,12 +13,17 @@ function rX=elimCP(rS, longCP, cpMargin,N,ventanaCP)
 
 % Nos quedamos solo con las subportadoras a partir de longCP-cpMargin, de
 % forma que exista una inmunidad de cpMargin instantes de atraso del sincronismo.
-    if(ventanaCP<1)
-        rX=rS(longCP-cpMargin+1:longCP-cpMargin+N,:);
-    else
-        rX=rS(longCP-ventanaCP-cpMargin+1:longCP-ventanaCP-cpMargin+N,:);
-    end
 
+rX=zeros(Nsc,Nsb);
+for i=1:Nsb
+    if(ventanaCP<1)
+        rX(:,i)=rS{1,i}(longCP(i)-cpMargin+1:longCP(i)-cpMargin+N);
+%         rX=rS(longCP-cpMargin+1:longCP-cpMargin+N,:);
+    else
+          rX(:,i)=rS{1,i}(longCP(i)-ventanaCP-cpMargin+1:longCP(i)-ventanaCP-cpMargin+N);
+%         rX=rS(longCP-ventanaCP-cpMargin+1:longCP-ventanaCP-cpMargin+N,:);
+    end
+end
 
 end
 

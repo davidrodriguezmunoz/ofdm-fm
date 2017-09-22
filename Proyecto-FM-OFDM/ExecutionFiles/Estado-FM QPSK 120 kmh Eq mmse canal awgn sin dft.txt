@@ -1,0 +1,1 @@
+SNR=15 nblocks=12000 ErrBlock=282 BERcanal=6.2643e-05 BLERcanal=0.0235

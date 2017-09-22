@@ -2,7 +2,7 @@ clc;
 clear;
 close all;
 
-v_vector=[ 50 120 250 500];
+v_vector=[ 250];
 m_vector={'QPSK'};
 
 
@@ -10,16 +10,15 @@ m_vector={'QPSK'};
 for m_aux=1:length(m_vector)
     for velocidad=v_vector
         modulacion=m_vector{m_aux};
-        text{1}='mmse canal awgn con dft';
-          text{2}= 'mmse canal awgn sin dft';
-            text{3}='zfe canal awgn con dft';
-         text{4}= 'zfe canal awgn sin dft';
+%           text{2}='mmse canal awgn con dft';
+        text{1}= 'mmse canal awgn sin dft';
+%           text{3}='zfe canal awgn con dft';
+%          text{4}= 'zfe canal awgn sin dft';
 
         for i=1:length(text)
             
             archivos_pintar{i}=['FM ',modulacion,' ',num2str(velocidad),' kmh Eq ',text{i}];
-%              archivos_pintar{i}=['FM ',modulacion,'  ',text{i}];
-             
+
         end
         colorVec = hsv(length(archivos_pintar));
         figure;
@@ -31,8 +30,7 @@ for m_aux=1:length(m_vector)
              BER_Vect=[BER_Vect BER' ];
             h=semilogy(SNR,BER,'-X','Color',colorVec(i,:)); % BER sin codificacion
             set(h,'linewidth',1.5)
-             leg_vec{i}=['equalizacion ' text{1,i}];
-%             leg_vec{i}=[ text{1,i}];
+            leg_vec{i}=['equalizacion ' text{1,i}];
             hold on;
             
                 
@@ -40,7 +38,6 @@ for m_aux=1:length(m_vector)
         end
         ylim([min(BER_Vect) 1]);
         legend(leg_vec);
-         title(['FM-OFDM ', num2str(velocidad),' kmh ', modulacion]);
-%           title(['FM-OFDM ', modulacion])
+        title(['FM-OFDM ', num2str(velocidad),' kmh ', modulacion]);
     end
 end
