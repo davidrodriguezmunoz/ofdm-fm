@@ -203,7 +203,7 @@ while (varBlockER<blockErSim || nblocks < nblocks_min)
         tS = introPN(tS,Pot_PN);
     end
     if efecto == CH || juntos
-        tS=filter(chan,tS')';
+        tS=filter(chan,tS.').';
     end
 
     % Adición de ruido Gaussiano
